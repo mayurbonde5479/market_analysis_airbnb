@@ -12,6 +12,8 @@ from pyspark.sql.functions import lit, rand, col, regexp_replace, when, round, f
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, DoubleType, LongType
 
 
+
+
 ## @params: [JOB_NAME]
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
@@ -21,7 +23,7 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-df_rds_new = spark.read.parquet('s3://group4rawdata/raw/')
+df_rds_new = spark.read.parquet('s3://airbnbrawdata/raw/')
 
 df = spark.read.format('csv').options(sep=",", escape='"', mode="PERMISSIVE", header=True, multiLine=True).load('s3://final-044/zip/total_data.csv')
 
