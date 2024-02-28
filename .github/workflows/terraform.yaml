@@ -14,7 +14,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_version: 1.7.3
 
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -53,7 +53,8 @@ jobs:
         working-directory: deploy
         run: |
           terraform apply -auto-approve
-          echo "::set-output name=status::success"
+          echo "::set-output name=status::success" 
+
 
       - name: Wait for 5 seconds
         if: ${{ always() }}
@@ -73,4 +74,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}    
+
+          

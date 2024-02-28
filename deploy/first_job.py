@@ -10,17 +10,16 @@ from pyspark.sql import SparkSession
 ## @params: [JOB_NAME]
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
-
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
+job.init(args['JOB_NAME'], args) 
 
 
 
 
-jdbc_url = "jdbc:mysql://database-1.cbx6lq4lpptb.us-east-1.rds.amazonaws.com:3306/rdsdata"
+jdbc_url = "jdbc:mysql://database-2.cayrvib30xep.us-east-1.rds.amazonaws.com:3306/rdsdata"
 
 jdbc_pro = {
     "user":"admin",
@@ -37,7 +36,7 @@ rds_df = spark.read.jdbc(url=jdbc_url,table=table_name,properties=jdbc_pro)
 
 # To write data to s3 Datalake 
 
-output_path = "s3://group4rawdata/gluejob/" 
+output_path = "s3://group4rawdata/raw/"                # change
 rds_df.coalesce(1).write \
     .option("header", "True") \
     .option("multiline", True) \

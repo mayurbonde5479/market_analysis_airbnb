@@ -82,7 +82,7 @@ new_df = new_df.withColumn("neighbourhood", when(new_df["neighbourhood"].isNull(
 #9)city:
 
 
-default_value = "Rio"
+default_value = "Unknown"
 new_df = new_df.withColumn("city", when(new_df["city"].isNull(), default_value).otherwise(new_df["city"]))
 
 
@@ -171,7 +171,7 @@ new_df = new_df.fillna({"security_deposit": 0})
 
 
 
-#22)extra_people:
+#22)extra_people: zero null
 
 
 from pyspark.sql.functions import when
@@ -183,7 +183,7 @@ new_df = new_df.withColumn("extra_people", when(new_df["extra_people"].isNull(),
 
 
 
-#28)review_scores_rating: #changing base 100 to base 10
+#28)review_scores_rating:
 
 new_df = new_df.withColumn("review_scores_rating",
 when(col("review_scores_rating").isNull(), None)
@@ -323,7 +323,6 @@ for field in new_schema:
 # to write in s3 bucket cleaned data in parquet format
 
 
-
 new_df.coalesce(1).write \
     .option("header", "True") \
     .option("multiline", True) \
@@ -334,6 +333,6 @@ new_df.coalesce(1).write \
 
 # in csv format
 
-#new_df.coalesce(1).write.mode("overwrite").option("header", "True").option("multiline", #True).csv("s3://final-044/sample/glue/")###
+#new_df.coalesce(1).write.mode("overwrite").option("header", "True").option("multiline", #True).csv("s3://final-044/sample/glue/")
 
 job.commit()

@@ -21,7 +21,7 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-df_rds_new = spark.read.parquet('s3://group4rawdata/gluejob/')
+df_rds_new = spark.read.parquet('s3://group4rawdata/raw/')
 
 df = spark.read.format('csv').options(sep=",", escape='"', mode="PERMISSIVE", header=True, multiLine=True).load('s3://final-044/zip/total_data.csv')
 
@@ -33,7 +33,7 @@ selected_columns = [
 "security_deposit", "guests_included", "extra_people", "availability_30", "availability_60",
 "availability_90", "availability_365", "number_of_reviews", "review_scores_rating",
 "instant_bookable", "month", "minimum_minimum_nights", "maximum_maximum_nights",
-"calculated_host_listings_count", "cancellation_policy"
+"calculated_host_listings_count"
 ]
 
 
@@ -47,6 +47,49 @@ new_df = df.union(df1_rds_new)
 
 df8=new_df.dropDuplicates()
 new_df=df8
+
+# give new schema to df
+
+new_schema = StructType([
+StructField("id", LongType()),
+StructField("name", StringType()),
+StructField("host_name", StringType()),
+StructField("host_response_time", StringType()),
+StructField("host_listings_count", IntegerType()),
+StructField("host_verifications", StringType()),
+StructField("host_identity_verified", StringType()),
+StructField("neighbourhood", StringType()),
+StructField("city", StringType()),
+StructField("latitude", DoubleType()),
+StructField("longitude", DoubleType()),
+StructField("property_type", StringType()),
+StructField("room_type", StringType()),
+StructField("accommodates", IntegerType()),
+StructField("bathrooms", IntegerType()),
+StructField("bedrooms", IntegerType()),
+StructField("beds", IntegerType()),
+StructField("amenities", StringType()),
+StructField("price", FloatType()),
+StructField("security_deposit", FloatType()),
+StructField("guests_included", IntegerType()),
+StructField("extra_people", FloatType()),
+StructField("availability_30", IntegerType()),
+StructField("availability_60", IntegerType()),
+StructField("availability_90", IntegerType()),
+StructField("availability_365", IntegerType()),
+StructField("number_of_reviews",IntegerType()),
+StructField("review_scores_rating", IntegerType()),
+StructField("instant_bookable", StringType()),
+StructField("month", StringType()),
+StructField("minimum_minimum_nights", IntegerType()),
+StructField("maximum_maximum_nights", IntegerType()),
+StructField("calculated_host_listings_count", IntegerType())
+
+])
+
+
+for field in new_schema:
+        new_df = new_df.withColumn(field.name, new_df[field.name].cast(field.dataType))
 
 
 # replace $
@@ -147,6 +190,7 @@ new_df = new_df.withColumn("beds", round(col("beds")).cast("int"))
 #mean_price = new_df.filter(col("price") != 0).select(mean(col("price"))).first()[0]
 #mean_price=int(mean_price)
 mean_price =542
+new_df = new_df.withColumn("price", round(col("price")).cast("int"))
 new_df = new_df.withColumn("price", when((col("price").isNull()) | (col("price") == 0), mean_price).otherwise(col("price")))
 
 
@@ -159,7 +203,7 @@ new_df = new_df.na.fill({"security_deposit": 0})
 
 
 
-#22)extra_people: 
+#22)extra_people: zero null
 
 # Replace null values in the column 'extra_people' with 0
 new_df = new_df.fillna({"extra_people": 0.0})
@@ -246,57 +290,24 @@ new_df = new_df.withColumn("maximum_maximum_nights", when((col("maximum_maximum_
 # make it integer
 new_df = new_df.withColumn("maximum_maximum_nights", round(col("maximum_maximum_nights")).cast("int"))
 
-# give new schema to df
-
-new_schema = StructType([
-StructField("id", LongType()),
-StructField("name", StringType()),
-StructField("host_name", StringType()),
-StructField("host_response_time", StringType()),
-StructField("host_listings_count", IntegerType()),
-StructField("host_verifications", StringType()),
-StructField("host_identity_verified", StringType()),
-StructField("neighbourhood", StringType()),
-StructField("city", StringType()),
-StructField("latitude", DoubleType()),
-StructField("longitude", DoubleType()),
-StructField("property_type", StringType()),
-StructField("room_type", StringType()),
-StructField("accommodates", IntegerType()),
-StructField("bathrooms", IntegerType()),
-StructField("bedrooms", IntegerType()),
-StructField("beds", IntegerType()),
-StructField("amenities", StringType()),
-StructField("guests_included", IntegerType()),
-StructField("availability_30", IntegerType()),
-StructField("availability_60", IntegerType()),
-StructField("availability_90", IntegerType()),
-StructField("availability_365", IntegerType()),
-StructField("number_of_reviews",IntegerType()),
-StructField("review_scores_rating", IntegerType()),
-StructField("instant_bookable", StringType()),
-StructField("month", StringType()),
-StructField("minimum_minimum_nights", IntegerType()),
-StructField("maximum_maximum_nights", IntegerType()),
-StructField("calculated_host_listings_count", IntegerType()),
-StructField("cancellation_policy", StringType())
-])
-
-
-for field in new_schema:
-        new_df = new_df.withColumn(field.name, new_df[field.name].cast(field.dataType))
-
 
 
 
 # to write in s3 bucket cleaned data in parquet format
 
-output_path = "s3://group4enrichdata/job/"
+output_path = "s3://group4enrichdata/clean/"
 
 new_df.coalesce(1).write \
 .option("header", "True") \
 .option("multiline", True) \
 .parquet(output_path)
 
+
+
+# in csv format
+
+
+
+# new_df.coalesce(1).write.mode("overwrite").option("header", "True").option("multiline", True).csv(output_path)
 
 job.commit()
