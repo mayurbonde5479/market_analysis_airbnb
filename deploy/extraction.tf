@@ -23,7 +23,7 @@ resource "random_id" "random_id_generator" {
 variable "topic_arn" {
   description = "topic arn for sns"
   type        = string
-  default     = "arn:aws:sns:us-east-1:542482520564:Vivek-topic"                      # change
+  default     = "arn:aws:sns:us-east-1:126751535369:Mayur_topic"                      # change
 }
 
 ####--------------------------------------- S3 bucket --------------------------------------------####
