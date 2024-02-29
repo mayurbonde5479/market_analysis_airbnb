@@ -1,9 +1,9 @@
-# terraform {
-#     cloud {
-#         organization = "group4dbda"
+terraform {
+  cloud {
+    organization = "MayurTerraformWorkspace"
 
-#         workspaces {
-#             name = "group4dbda"
-#         }  
-#     }
-# }
+    workspaces {
+      name = "Mayur_Chinmay_Workspace"
+    }
+  }
+}
