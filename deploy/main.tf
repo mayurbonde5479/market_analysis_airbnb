@@ -1,9 +1,9 @@
-terraform {
-  cloud {
-    organization = "MayurTerraformWorkspace"
+# terraform {
+#   cloud {
+#     organization = "MayurTerraformWorkspace"
 
-    workspaces {
-      name = "Mayur_Chinmay_Workspace"
-    }
-  }
-}
+#     workspaces {
+#       name = "Mayur_Chinmay_Workspace"
+#     }
+#   }
+# }
