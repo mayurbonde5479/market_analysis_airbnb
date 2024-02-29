@@ -44,4 +44,6 @@ rds_df.coalesce(1).write \
     .parquet(output_path)
 
 
+
+
 job.commit()
